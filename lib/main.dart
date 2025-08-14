@@ -1,66 +1,63 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:task_management/src/core/router/routes.dart';
+import 'src/features/project_screen/model/project_model.dart';
 
-void main() {
+import 'firebase_options.dart';
+import 'home_page.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(ProjectAdapter()); // ✅ Register the generated adapter
+  await Hive.openBox<Project>('projects');
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter',
-      theme: ThemeData(
 
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool isLogin = false;
+  bool isLoading = true;
+  @override
+  void initState() {
+    login();
+    super.initState();
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  Future<void> login() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _counter++;
+      isLogin = prefs.getBool("isLogin") ?? false;
+      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+    if (isLoading) {
+      return const MaterialApp(
+        home: Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
+    return SafeArea(
+      child: GetMaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        initialRoute: isLogin ? '/project_screen' : '/login_screen',
+        getPages:AppRoutes.appRoutes(),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
