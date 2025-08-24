@@ -1,9 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/src/features/auth/presentation/bloc/auth_bloc.dart';
 
-import 'package:hive_flutter/adapters.dart';import 'app.dart';
+// import 'package:hive_flutter/adapters.dart';
+import 'app.dart';
 import 'injector.dart';
-import 'src/features/project_screen/model/project_model.dart';
+// import 'src/features/project_screen2/model/project_model.dart';
 
 import 'firebase_options.dart';
 
@@ -14,13 +17,19 @@ Future<void> main() async {
 
   await initialize();
 
-  await Hive.initFlutter();
-  Hive.registerAdapter(ProjectAdapter()); // ✅ Register the generated adapter
-  await Hive.openBox<Project>('projects');
+  // await Hive.initFlutter();
+  // Hive.registerAdapter(ProjectAdapter()); // ✅ Register the generated adapter
+  // await Hive.openBox<Project>('projects');
 
   // runApp(const TaskManagement());
-  runApp(const TaskManagement());
+  runApp(
+    MultiBlocProvider(
+      providers: [BlocProvider(create: (_) => sl<AuthBloc>())],
+      child: const TaskManagement(),
+    ),
+  );
 }
+
 //
 // class MyApp extends StatelessWidget {
 //   const MyApp({super.key});
@@ -30,7 +39,7 @@ Future<void> main() async {
 //     return MaterialApp(
 //       debugShowCheckedModeBanner: false,
 //       title: "Task Management",
-//       // initialRoute: isLogin ? '/project_screen' : '/login_screen',
+//       // initialRoute: isLogin ? '/project_screen2' : '/login_screen',
 //       home: SignUpScreen(),
 //     );
 //     // return AppRoutes.appRoutes();
@@ -38,7 +47,7 @@ Future<void> main() async {
 //     //   child: GetMaterialApp(
 //     //     debugShowCheckedModeBanner: false,
 //     //     title: 'Flutter Demo',
-//     //     initialRoute: isLogin ? '/project_screen' : '/login_screen',
+//     //     initialRoute: isLogin ? '/project_screen2' : '/login_screen',
 //     //     getPages:AppRoutes.appRoutes(),
 //     //   ),
 //     // );

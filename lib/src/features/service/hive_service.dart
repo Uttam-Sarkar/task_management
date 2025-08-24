@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import '../project_screen/model/project_model.dart';
+import '../project_screen2/model/project_model.dart';
 
 class HiveService {
   final Box<Project> box = Hive.box<Project>('projects');

@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:task_management/src/core/utils/theme/theme.dart';
 
-class AppDrawer extends StatelessWidget {
+import '../../../../core/utils/theme/theme.dart';
 
-  const AppDrawer({super.key});
+class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return  Drawer(
-      child: ListView(
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Profile", style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.amberAccent,
+      ),
+      body: ListView(
         children: [
           ListTile(
             leading: const Icon(Icons.exit_to_app),
