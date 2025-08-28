@@ -31,9 +31,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
        _appUserCubit = appUserCubit,
        _currentUserUseCase = currentUserUseCase,
        super(AuthInitial()) {
+    on<AuthEvent>(_onInitial);
     on<AuthSignUp>(_onSignUp);
     on<AuthLogin>(_onLogin);
     on<AuthIsUserLoggedIn>(_onIsUserLoggedIn);
+  }
+
+  void _onInitial(_, emit) {
+    emit(AuthLoading());
   }
 
   void _emitAuthSuccess(UserEntity userEntity, emit) {
@@ -54,14 +59,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         print(r.name);
         print("Uttam");
         print(r.id);
-        emit(AuthSuccess(r));
-
-      }
+        _emitAuthSuccess(r, emit);
+      },
     );
   }
 
   void _onSignUp(event, emit) async {
-    emit(AuthLoading());
     final response = await _userSignupUseCase(
       signupModel: SignUpModel(
         name: event.name,
@@ -76,7 +79,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _onLogin(event, emit) async {
-    emit(AuthLoading());
     final response = await _userLoginUseCase(
       loginModel: LoginModel(email: event.email, password: event.password),
     );

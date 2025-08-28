@@ -29,6 +29,28 @@ class UserModel extends UserEntity {
       // 'createdAt': createdAt
     };
   }
+
+  UserModel copyWith({
+    String? id,
+    String? name,
+    String? email,
+    String? password,
+    // UserRole? role,
+    DateTime? createdAt,
+    DateTime? lastLoginAt,
+    bool? isActive,
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      // role: role ?? this.role,
+      // createdAt: createdAt ?? this.createdAt,
+      lastLoginAt: lastLoginAt ?? this.lastLoginAt,
+      isActive: isActive ?? this.isActive,
+    );
+  }
   //
   // factory UserModel.fromJson(Map<String, dynamic> json) {
   //   return UserModel(

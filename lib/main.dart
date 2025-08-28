@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:task_management/src/core/shared/cubits/app_user_cubit.dart';
 import 'package:task_management/src/features/auth/presentation/bloc/auth_bloc.dart';
 
 // import 'package:hive_flutter/adapters.dart';
@@ -24,7 +25,10 @@ Future<void> main() async {
   // runApp(const TaskManagement());
   runApp(
     MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => sl<AuthBloc>())],
+      providers: [
+        BlocProvider(create: (_) => sl<AppUserCubit>()),
+        BlocProvider(create: (_) => sl<AuthBloc>()),
+      ],
       child: const TaskManagement(),
     ),
   );

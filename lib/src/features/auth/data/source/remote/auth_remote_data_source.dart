@@ -13,6 +13,7 @@ abstract interface class AuthRemoteDataSource {
   Future<UserModel> loginWithEmailPassword({required LoginModel loginModel});
 
   Future<UserModel?> getCurrentUserData();
+  // Stream<UserModel?> getCurrentUserDataStream();
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -83,33 +84,73 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     }
   }
 
+
   @override
   Future<UserModel?> getCurrentUserData() async {
     try {
-      var data;
-      print("1 fetch userdata $data");
+      final user = await currentUser.first; // initial user
+      if (user == null) return null;
 
-      currentUser.listen((User? user) async {
-        Future.delayed(Duration(seconds: 3));
-        if (user == null) {
-          data = null;
-        } else {
-          data = await FirebaseFirestore.instance
-              .collection("users")
-              .doc(user.uid)
-              .get();
-          // for(int i=0; i<data):
-          print("2 fetch userdata start");
-          print("2 fetch userdata ${data.id}");
-          print("2 fetch userdata ${UserModel.fromJson(data).name.toString()}");
-          print("2 fetch userdata ${data.email}");
+      final doc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .get();
 
-        }
-      });
-      print("fetch userdata ${data.toString()}");
-      return UserModel.fromJson(data);
+      if (!doc.exists) return null;
+      // return UserModel.fromJson(doc.data()!);
+      return UserModel.fromJson(doc.data()!)
+          .copyWith(email: user.email);
     } catch (e) {
       throw ServerException(e.toString());
     }
   }
+
+// @override
+  // Future<UserModel?> getCurrentUserData() async {
+  //   try {
+  //     var userData = null;
+  //     User? userInfo = await currentUser.first;
+  //     // final initialUser = await currentUser.first;
+  //     print("Initial user: $userInfo");
+  //
+  //     currentUser.listen((user) async {
+  //       userInfo = user;
+  //       if (user == null) {
+  //         print("No user logged in");
+  //       } else {
+  //         userData = await FirebaseFirestore.instance
+  //             .collection("users")
+  //             .doc(user.uid)
+  //             .get();
+  //         final data = userData.data() as Map<String, dynamic>;
+  //       }
+  //     });
+  //     print("fetch userdata ${userData.toString()}");
+  //     if (userInfo == null) {
+  //       print("1.2 Data is Null");
+  //       return null;
+  //     }
+  //     return UserModel.fromJson(userData).copyWith(email: userInfo!.email);
+  //   } catch (e) {
+  //     throw ServerException(e.toString());
+  //   }
+  // }
+
+  // Stream<UserModel?> getCurrentUserDataStream() {
+  //   return currentUser.asyncExpand((user) {
+  //     if (user == null) {
+  //       return Stream.value(null);
+  //     }
+  //     return FirebaseFirestore.instance
+  //         .collection("users")
+  //         .doc(user.uid)
+  //         .snapshots()
+  //         .map((doc) {
+  //       if (!doc.exists) return null;
+  //       return UserModel.fromJson(doc.data()!)
+  //           .copyWith(email: user.email);
+  //     });
+  //   });
+  // }
+
 }
